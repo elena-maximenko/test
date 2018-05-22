@@ -30,6 +30,95 @@ import java.io.IOException;
 public class Test {
 
     static final Logger logger = LogManager.getLogger(Logger.class.getName());
+
+    private final String indexName = "people";
+    private final String indexId = "1";
+    private final String indexType = "names";
+
+    private static RestHighLevelClient client;
+
+    @BeforeClass
+    public static void setupClient() {
+        client = new RestHighLevelClient(
+                RestClient.builder(
+                        new HttpHost("localhost", 9200, "http")));
+    }
+
+    @org.junit.Test
+    public void createPeopleIndex() throws IOException {
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
+
+        createIndexRequest.settings(Settings.builder()
+                .put("index.number_of_shards", 4)
+                .put("index.number_of_replicas", 3)
+        );
+
+        createIndexRequest.mapping("names",
+                "  {\n" +
+                        "    \"names\": {\n" +
+                        "      \"properties\": {\n" +
+
+                        "        \"firstName\": {\n" +
+                        "          \"type\": \"text\"\n" +
+                        "        },\n" +
+
+                        "        \"lastName\": {\n" +
+                        "          \"type\": \"text\"\n" +
+                        "        }\n" +
+
+                        "  }" +
+                        "  }" +
+                        "  }",
+                XContentType.JSON);
+
+        CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest);
+
+        boolean acknowledged = createIndexResponse.isAcknowledged();
+        boolean shardsAcknowledged = createIndexResponse.isShardsAcknowledged();
+
+        assertTrue(acknowledged && shardsAcknowledged);
+    }
+
+    @org.junit.Test
+    public void putPersonInPeopleIndex() throws IOException {
+
+        IndexRequest request = new IndexRequest(
+                indexName,
+                indexType,
+                indexId
+        );
+
+        String jsonString = "{" +
+                "\"firstName\":\"Olena\"," +
+                "\"lastName\":\"Maksymenko\"" +
+                "}";
+
+        request.source(jsonString, XContentType.JSON);
+
+        IndexResponse indexResponse = client.index(request);
+
+        String index = indexResponse.getIndex();
+        String type = indexResponse.getType();
+        String id = indexResponse.getId();
+
+        assertEquals(indexId, id);
+        assertEquals(indexType, type);
+        assertEquals(index, indexName);
+    }
+
+    @org.junit.Test
+    public void deletePeopleIndex() throws IOException {
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+
+        DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest);
+
+        boolean deleteAcknowledged = deleteIndexResponse.isAcknowledged();
+
+        assertTrue(deleteAcknowledged);
+    }
+
+
+
     /*static Client client;
 
     @BeforeClass
@@ -57,20 +146,10 @@ public class Test {
         assertEquals("Olena", type);
     }*/
 
-    /*public static void main(String[] args) {
-        IndexRequest request = new IndexRequest(
-                "posts",
-                "doc",
-                "2");
-        String jsonString = "{" +
-                "\"user\":\"olena\"," +
-                "\"postDate\":\"2018-05-22\"," +
-                "\"content\":\"index request using\"" +
-                "}";
-        request.source(jsonString, XContentType.JSON);
-    }*/
 
+   /*/ RIGHT STUFF IS GOING ON HERE
     public static void main(String[] args) throws IOException {
+
 
         String indexName = "people";
 
@@ -78,18 +157,6 @@ public class Test {
         RestHighLevelClient client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
-
-        try{
-            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-
-            DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest);
-
-            boolean deleteAcknowledged = deleteIndexResponse.isAcknowledged();
-            System.out.println("delete acknowledged = " + deleteAcknowledged);
-        }
-        catch (ElasticsearchException e){
-            e.printStackTrace();
-        }
 
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
 
@@ -151,6 +218,6 @@ public class Test {
         System.out.println("id = " + id);
         System.out.println("version = " + version);
 
-        //client.close();
-    }
+        client.close();
+    }*/
 }
