@@ -126,12 +126,14 @@ public class Testing {
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
+        // query for search matching
         MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(searchKey, searchValue);
 
         sourceBuilder.query(matchQueryBuilder);
 
         SearchResponse searchResponse = client.search(searchRequest);
 
+        // matching items
         SearchHits hits = searchResponse.getHits();
 
         SearchHit[] searchHits = hits.getHits();
