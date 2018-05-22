@@ -2,8 +2,11 @@ package com.elasticsearch.demo.test;
 
 
 import org.apache.http.HttpHost;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
@@ -76,6 +79,18 @@ public class Test {
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
 
+        try{
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+
+            DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest);
+
+            boolean deleteAcknowledged = deleteIndexResponse.isAcknowledged();
+            System.out.println("delete acknowledged = " + deleteAcknowledged);
+        }
+        catch (ElasticsearchException e){
+            e.printStackTrace();
+        }
+
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
 
         createIndexRequest.settings(Settings.builder()
@@ -111,21 +126,22 @@ public class Test {
         System.out.println("shardsAcknowledged = " + shardsAcknowledged);
 
 
-   /*     IndexRequest request = new IndexRequest(
+        IndexRequest request = new IndexRequest(
                 indexName,
-                "doc",
-                "1");
+                "names",
+                "1"
+                );
 
         String jsonString = "{" +
                 "\"firstName\":\"Olena\"," +
                 "\"lastName\":\"Maksymenko\"" +
                 "}";
 
-        //IndexResponse indexResponse = client.index(request);
-
         request.source(jsonString, XContentType.JSON);
 
-        /*String index = indexResponse.getIndex();
+        IndexResponse indexResponse = client.index(request);
+
+        String index = indexResponse.getIndex();
         String type = indexResponse.getType();
         String id = indexResponse.getId();
         long version = indexResponse.getVersion();
@@ -133,8 +149,8 @@ public class Test {
         System.out.println("index = " + index);
         System.out.println("type = " + type);
         System.out.println("id = " + id);
-        System.out.println("version = " + version);*/
+        System.out.println("version = " + version);
 
-        client.close();
+        //client.close();
     }
 }
