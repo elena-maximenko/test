@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package com.elasticsearch.demo.test;
 
 
@@ -35,11 +36,11 @@ import static org.testng.Assert.assertTrue;
 
 public class Testing {
 
-    private static final Logger LOGGER = LogManager.getLogger(Logger.class.getName());
+    private static final Logger logger = LogManager.getLogger(Logger.class.getName());
 
-    private static final String INDEX_NAME = "people";
-    private static final String INDEX_ID = "1";
-    private static final String INDEX_TYPE = "names";
+    private static final String indexName = "people";
+    private static final String indexId = "1";
+    private static final String indexType = "names";
 
     private static RestHighLevelClient client;
 
@@ -55,7 +56,7 @@ public class Testing {
     public void createPeopleIndex() throws IOException {
 
         // request for the index creation
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest(INDEX_NAME);
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
 
         createIndexRequest.settings(Settings.builder()
                 .put("index.number_of_shards", 4)
@@ -93,9 +94,9 @@ public class Testing {
     public void putPersonInPeopleIndex() throws IOException {
 
         IndexRequest request = new IndexRequest(
-                INDEX_NAME,
-                INDEX_TYPE,
-                INDEX_ID
+                indexName,
+                indexType,
+                indexId
         );
 
         String jsonString = "{" +
@@ -111,9 +112,9 @@ public class Testing {
         String type = indexResponse.getType();
         String id = indexResponse.getId();
 
-        assertEquals(INDEX_ID, id);
-        assertEquals(INDEX_TYPE, type);
-        assertEquals(index, INDEX_NAME);
+        assertEquals(indexId, id);
+        assertEquals(indexType, type);
+        assertEquals(index, indexName);
     }
 
 
@@ -123,10 +124,10 @@ public class Testing {
         String searchKey = "firstName";
         String searchValue = "Olena";
 
-        SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
+        SearchRequest searchRequest = new SearchRequest(indexName);
 
         // make a restriction for the search
-        searchRequest.types(INDEX_TYPE);
+        searchRequest.types(indexType);
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
@@ -152,9 +153,9 @@ public class Testing {
             System.out.println("type = " + type);
             System.out.println("id = " + id);
 
-            assertEquals(INDEX_NAME, index);
-            assertEquals(INDEX_TYPE, type);
-            assertEquals(INDEX_ID, id);
+            assertEquals(indexName, index);
+            assertEquals(indexType, type);
+            assertEquals(indexId, id);
 
         }
     }
@@ -163,7 +164,7 @@ public class Testing {
     public void deletePeopleIndex() throws IOException{
 
         // check for people index deleting
-        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(INDEX_NAME);
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
 
         DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest);
 
@@ -172,4 +173,5 @@ public class Testing {
         assertTrue(deleteAcknowledged);
     }
 }
-
+=======
+>>>>>>> 3c9a693... Empty file for normal pr

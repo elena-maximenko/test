@@ -2,7 +2,6 @@ package com.elasticsearch.demo.test;
 
 
 import org.apache.http.HttpHost;
-
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -20,42 +19,39 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import java.io.IOException;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class Testing {
 
-    private static final Logger LOGGER = LogManager.getLogger(Logger.class.getName());
+    static final Logger logger = LogManager.getLogger(Logger.class.getName());
 
-    private static final String INDEX_NAME = "people";
-    private static final String INDEX_ID = "1";
-    private static final String INDEX_TYPE = "names";
+    private final String indexName = "people";
+    private final String indexId = "1";
+    private final String indexType = "names";
 
     private static RestHighLevelClient client;
 
     @BeforeClass
     public static void setupClient() {
-
         client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
     }
 
-    @Test(priority = 1)
+    @Test
     public void createPeopleIndex() throws IOException {
 
         // request for the index creation
-        CreateIndexRequest createIndexRequest = new CreateIndexRequest(INDEX_NAME);
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
 
         createIndexRequest.settings(Settings.builder()
                 .put("index.number_of_shards", 4)
@@ -89,13 +85,13 @@ public class Testing {
         assertTrue(acknowledged && shardsAcknowledged);
     }
 
-    @Test(priority = 2)
+    @Test
     public void putPersonInPeopleIndex() throws IOException {
 
         IndexRequest request = new IndexRequest(
-                INDEX_NAME,
-                INDEX_TYPE,
-                INDEX_ID
+                indexName,
+                indexType,
+                indexId
         );
 
         String jsonString = "{" +
@@ -111,22 +107,22 @@ public class Testing {
         String type = indexResponse.getType();
         String id = indexResponse.getId();
 
-        assertEquals(INDEX_ID, id);
-        assertEquals(INDEX_TYPE, type);
-        assertEquals(index, INDEX_NAME);
+        assertEquals(indexId, id);
+        assertEquals(indexType, type);
+        assertEquals(index, indexName);
     }
 
 
-    @Test(priority = 3)
+    @Test
     public void searchInPeopleIndex()throws IOException{
 
         String searchKey = "firstName";
         String searchValue = "Olena";
 
-        SearchRequest searchRequest = new SearchRequest(INDEX_NAME);
+        SearchRequest searchRequest = new SearchRequest(indexName);
 
         // make a restriction for the search
-        searchRequest.types(INDEX_TYPE);
+        searchRequest.types(indexType);
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
@@ -152,18 +148,14 @@ public class Testing {
             System.out.println("type = " + type);
             System.out.println("id = " + id);
 
-            assertEquals(INDEX_NAME, index);
-            assertEquals(INDEX_TYPE, type);
-            assertEquals(INDEX_ID, id);
+            assertEquals(indexName, index);
+            assertEquals(indexType, type);
+            assertEquals(indexId, id);
 
         }
-    }
-
-    @AfterClass
-    public void deletePeopleIndex() throws IOException{
 
         // check for people index deleting
-        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(INDEX_NAME);
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
 
         DeleteIndexResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest);
 
@@ -171,5 +163,5 @@ public class Testing {
 
         assertTrue(deleteAcknowledged);
     }
-}
 
+}
