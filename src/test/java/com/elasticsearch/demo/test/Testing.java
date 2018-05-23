@@ -2,6 +2,7 @@ package com.elasticsearch.demo.test;
 
 
 import org.apache.http.HttpHost;
+
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -19,35 +20,38 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class Testing {
 
-    static final Logger logger = LogManager.getLogger(Logger.class.getName());
+    private static final Logger logger = LogManager.getLogger(Logger.class.getName());
 
-    private final String indexName = "people";
-    private final String indexId = "1";
-    private final String indexType = "names";
+    private static final String indexName = "people";
+    private static final String indexId = "1";
+    private static final String indexType = "names";
 
     private static RestHighLevelClient client;
 
     @BeforeClass
     public static void setupClient() {
+
         client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
     }
 
-    @Test
+    @Test(priority = 1)
     public void createPeopleIndex() throws IOException {
 
         // request for the index creation
@@ -85,7 +89,7 @@ public class Testing {
         assertTrue(acknowledged && shardsAcknowledged);
     }
 
-    @Test
+    @Test(priority = 2)
     public void putPersonInPeopleIndex() throws IOException {
 
         IndexRequest request = new IndexRequest(
@@ -113,7 +117,7 @@ public class Testing {
     }
 
 
-    @Test
+    @Test(priority = 3)
     public void searchInPeopleIndex()throws IOException{
 
         String searchKey = "firstName";
@@ -153,6 +157,10 @@ public class Testing {
             assertEquals(indexId, id);
 
         }
+    }
+
+    @AfterClass
+    public void deletePeopleIndex() throws IOException{
 
         // check for people index deleting
         DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
@@ -163,5 +171,4 @@ public class Testing {
 
         assertTrue(deleteAcknowledged);
     }
-
 }
