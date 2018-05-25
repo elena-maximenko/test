@@ -11,11 +11,15 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
+
 import org.elasticsearch.index.query.MatchQueryBuilder;
+
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -46,6 +50,7 @@ public class Testing {
     @BeforeClass
     public static void setupClient() {
 
+        // set up the connection with elasticsearch
         client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
@@ -142,15 +147,12 @@ public class Testing {
 
         SearchHit[] searchHits = hits.getHits();
 
+        //for each match
         for (SearchHit hit : searchHits) {
 
             String index = hit.getIndex();
             String type = hit.getType();
             String id = hit.getId();
-
-            System.out.println("index = " + index);
-            System.out.println("type = " + type);
-            System.out.println("id = " + id);
 
             assertEquals(INDEX_NAME, index);
             assertEquals(INDEX_TYPE, type);
